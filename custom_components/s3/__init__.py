@@ -16,6 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 CONF_REGION = "region_name"
 CONF_ACCESS_KEY_ID = "aws_access_key_id"
 CONF_SECRET_ACCESS_KEY = "aws_secret_access_key"
+CONF_ENDPOINT_URL = "endpoint_url"
 
 DOMAIN = "s3"
 COPY_SERVICE = "copy"
@@ -49,6 +50,7 @@ SUPPORTED_REGIONS = [
     "ap-northeast-1",
     "ap-south-1",
     "sa-east-1",
+    "us-phoenix-1",
 ]
 
 STORAGE_CLASSES = [
@@ -68,6 +70,7 @@ S3_SCHEMA = vol.Schema(
         vol.Optional(CONF_REGION, default=DEFAULT_REGION): vol.In(SUPPORTED_REGIONS),
         vol.Required(CONF_ACCESS_KEY_ID): cv.string,
         vol.Required(CONF_SECRET_ACCESS_KEY): cv.string,
+        vol.Required(CONF_ENDPOINT_URL): cv.string,
     }
 )
 
@@ -142,7 +145,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
         if s3_client is None:
             _LOGGER.error("S3 client instance not found")
             return
-        
+
         copy_source = {
             'Bucket': bucket_source,
             'Key': key_source
@@ -191,6 +194,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_REGION: entry.data[CONF_REGION],
         CONF_ACCESS_KEY_ID: entry.data[CONF_ACCESS_KEY_ID],
         CONF_SECRET_ACCESS_KEY: entry.data[CONF_SECRET_ACCESS_KEY],
+	CONF_ENDPOINT_URL: entry.data[CONF_ENDPOINT_URL],
     }
     client = boto3.client("s3", **aws_config)  # Will not raise error.
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = client

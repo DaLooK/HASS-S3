@@ -6,6 +6,7 @@ from . import (
     CONF_REGION,
     CONF_ACCESS_KEY_ID,
     CONF_SECRET_ACCESS_KEY,
+    CONF_ENDPOINT_URL,
     DEFAULT_REGION,
     SUPPORTED_REGIONS,
 )
@@ -19,12 +20,13 @@ class S3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             await self.async_set_unique_id(user_input[CONF_ACCESS_KEY_ID])
             self._abort_if_unique_id_configured()
-            
+
             return self.async_create_entry(title=user_input[CONF_ACCESS_KEY_ID], data=user_input)
 
         data_schema = vol.Schema(
             {
                 vol.Optional(CONF_REGION, default=DEFAULT_REGION): vol.In(SUPPORTED_REGIONS),
+                vol.Required(CONF_ENDPOINT_URL): str,
                 vol.Required(CONF_ACCESS_KEY_ID): str,
                 vol.Required(CONF_SECRET_ACCESS_KEY): str,
             }
